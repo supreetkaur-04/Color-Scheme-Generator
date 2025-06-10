@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Scheme Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #090421, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background-color: rgba(255, 255, 255, 0.92);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            padding: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #1a2a6c, #b21f1f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        #color-picker {
+            width: 80px;
+            height: 45px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .mode-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+        
+        #mode-selector {
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            background-color: white;
+            font-weight: 500;
+            color: #34495e;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        #mode-selector:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        #generate-btn {
+            padding: 13px 25px;
+            background: linear-gradient(45deg, #3498db, #2c3e50);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        #generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        #generate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .color-scheme {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .color-card {
+            width: 160px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .color-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .color-display {
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .color-display:hover {
+            filter: brightness(1.1);
+        }
+        
+        .color-info {
+            background-color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .color-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .color-hex {
+            font-weight: 500;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #27ae60;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(52, 152, 219, 0.2);
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 20px;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .color-card {
+                width: calc(50% - 20px);
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .color-card {
+                width: 100%;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-palette"></i> Color Scheme Generator</h1>
+        </header>
+        
+        <div class="controls">
+            <div class="color-picker-container">
+                <div class="color-preview" id="color-preview" style="background-color: #3498db;"></div>
+                <input type="color" id="color-picker" value="#3498db">
+            </div>
+            
+            <div class="mode-selector">
+                <label for="mode-selector">Harmony Rule:</label>
+                <select id="mode-selector">
+                    <option value="analogic">Analogic</option>
+                    <option value="monochrome">Monochrome</option>
+                    <option value="monochrome-dark">Monochrome Dark</option>
+                    <option value="monochrome-light">Monochrome Light</option>
+                    <option value="complement">Complement</option>
+                    <option value="analogic-complement">Analogic Complement</option>
+                    <option value="triad">Triad</option>
+                    <option value="quad">Quad</option>
+                </select>
+            </div>
+            
+            <button id="generate-btn">Generate Palette</button>
+        </div>
+        
+        <div class="color-scheme" id="color-scheme">
+        </div>
+        
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Generating beautiful colors...</p>
+        </div>
+        
+        <footer>
+            <p>Powered by TheColorAPI | Click on any color to copy its HEX value</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification">Color copied to clipboard!</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const colorPicker = document.getElementById('color-picker');
+            const colorPreview = document.getElementById('color-preview');
+            const modeSelector = document.getElementById('mode-selector');
+            const generateBtn = document.getElementById('generate-btn');
+            const colorScheme = document.getElementById('color-scheme');
+            const loading = document.getElementById('loading');
+            const notification = document.getElementById('notification');
+            let baseColor = colorPicker.value.substring(1); // Remove the #
+            colorPicker.addEventListener('input', function() {
+                colorPreview.style.backgroundColor = this.value;
+                baseColor = this.value.substring(1);
+            });
+            
+            generateColorScheme();
+            
+            generateBtn.addEventListener('click', generateColorScheme);
+            
+            function generateColorScheme() {
+                loading.style.display = 'block';
+                colorScheme.innerHTML = '';
+                const mode = modeSelector.value;
+                const apiUrl = `https://www.thecolorapi.com/scheme?hex=${baseColor}&mode=${mode}&count=5`;
+                
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        loading.style.display = 'none';
+                        const colors = data.colors.map(color => color.hex.value);
+                        displayColorScheme(colors);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching color scheme:', error);
+                        loading.style.display = 'none';
+                        colorScheme.innerHTML = '<p class="error">Failed to load color scheme. Please try again.</p>';
+                    });
+            }
+            
+            function displayColorScheme(colors) {
+                colorScheme.innerHTML = '';
+                
+                colors.forEach(color => {
+                    const colorCard = document.createElement('div');
+                    colorCard.className = 'color-card';
+                    const colorDisplay = document.createElement('div');
+                    colorDisplay.className = 'color-display';
+                    colorDisplay.style.backgroundColor = color;
+                    const colorInfo = document.createElement('div');
+                    colorInfo.className = 'color-info';
+                    const colorName = document.createElement('div');
+                    colorName.className = 'color-name';
+                    colorName.textContent = getColorName(color);
+                    const colorHex = document.createElement('div');
+                    colorHex.className = 'color-hex';
+                    colorHex.textContent = color;
+                    colorInfo.appendChild(colorName);
+                    colorInfo.appendChild(colorHex);
+                    colorCard.appendChild(colorDisplay);
+                    colorCard.appendChild(colorInfo);
+                    colorScheme.appendChild(colorCard);
+                    colorCard.addEventListener('click', function() {
+                        copyToClipboard(color);
+                        showNotification();
+                    });
+                });
+            }
+            
+            function getColorName(hex) {
+                const colorNames = {
+                    '#000000': 'Black',
+                    '#ffffff': 'White',
+                    '#ff0000': 'Red',
+                    '#00ff00': 'Green',
+                    '#0000ff': 'Blue',
+                    '#ffff00': 'Yellow',
+                    '#ff00ff': 'Magenta',
+                    '#00ffff': 'Cyan',
+                    '#ffa500': 'Orange',
+                    '#800080': 'Purple'
+                };
+                
+                const namedColors = Object.keys(colorNames);
+                let closestColor = '';
+                let minDistance = Infinity;
+                
+                for (const namedColor of namedColors) {
+                    const distance = colorDistance(hex, namedColor);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestColor = namedColor;
+                    }
+                }
+                
+                if (minDistance < 100) {
+                    return colorNames[closestColor];
+                }
+                
+                return hexToName(hex);
+            }
+            
+            function hexToName(hex) {
+                const r = parseInt(hex.substring(1, 3), 16);
+                const g = parseInt(hex.substring(3, 5), 16);
+                const b = parseInt(hex.substring(5, 7), 16);
+                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+                if (r > g && r > b) {
+                    if (brightness > 180) return 'Light Red';
+                    if (brightness < 80) return 'Dark Red';
+                    return 'Red';
+                } else if (g > r && g > b) {
+                    if (brightness > 180) return 'Light Green';
+                    if (brightness < 80) return 'Dark Green';
+                    return 'Green';
+                } else if (b > r && b > g) {
+                    if (brightness > 180) return 'Light Blue';
+                    if (brightness < 80) return 'Dark Blue';
+                    return 'Blue';
+                } else if (r === g && g === b) {
+                    if (brightness > 200) return 'White';
+                    if (brightness > 150) return 'Light Gray';
+                    if (brightness < 50) return 'Black';
+                    return 'Gray';
+                } else {
+                    return 'Mixed Color';
+                }
+            }
+            
+            function colorDistance(hex1, hex2) {
+                const r1 = parseInt(hex1.substring(1, 3), 16);
+                const g1 = parseInt(hex1.substring(3, 5), 16);
+                const b1 = parseInt(hex1.substring(5, 7), 16);
+                const r2 = parseInt(hex2.substring(1, 3), 16);
+                const g2 = parseInt(hex2.substring(3, 5), 16);
+                const b2 = parseInt(hex2.substring(5, 7), 16);
+                
+                return Math.sqrt(
+                    Math.pow(r2 - r1, 2) + 
+                    Math.pow(g2 - g1, 2) + 
+                    Math.pow(b2 - b1, 2)
+                );
+            }
+            
+            function copyToClipboard(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+            
+            function showNotification() {
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
